@@ -1,0 +1,40 @@
+{
+  "endpoints": [
+    {
+      "name": "Google",
+      "url": "https://www.google.com",
+      "method": "GET",
+      "interval": 30,
+      "timeout": 10
+    },
+    {
+      "name": "GitHub API",
+      "url": "https://api.github.com",
+      "method": "GET",
+      "interval": 60,
+      "timeout": 15
+    },
+    {
+      "name": "HTTPBin",
+      "url": "https://httpbin.org/status/200",
+      "method": "GET",
+      "interval": 45,
+      "timeout": 10
+    },
+    {
+      "name": "Example Down Service",
+      "url": "https://httpbin.org/status/500",
+      "method": "GET",
+      "interval": 30,
+      "timeout": 10
+    }
+  ],
+  "server": {
+    "port": "8080"
+  },
+  "metrics": {
+    "enabled": true,
+    "path": "/metrics",
+    "port": "9091"
+  }
+}
