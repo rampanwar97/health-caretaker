@@ -1,0 +1,21 @@
+apiVersion: v2
+name: health-caretaker
+description: A modern, real-time health monitoring application for HTTP/HTTPS endpoints
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+home: https://github.com/rampanwar97/health-caretaker
+sources:
+  - https://github.com/rampanwar97/health-caretaker
+maintainers:
+  - name: Ram Singh Panwar
+    email: ramp70604@gmail.com
+keywords:
+  - monitoring
+  - health-check
+  - endpoint
+  - prometheus
+  - metrics
+  - dashboard
+annotations:
+  category: Monitoring

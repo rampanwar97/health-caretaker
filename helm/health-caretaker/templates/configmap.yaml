@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "health-caretaker.fullname" . }}
+  labels:
+    {{- include "health-caretaker.labels" . | nindent 4 }}
+data:
+  config.json: |
+    {
+      "endpoints": [
+        {{- range $index, $endpoint := .Values.config.endpoints }}
+        {{- if $index }},{{- end }}
+        {
+          "name": {{ $endpoint.name | quote }},
+          "url": {{ $endpoint.url | quote }},
+          "method": {{ $endpoint.method | quote }},
+          "interval": {{ $endpoint.interval }},
+          "timeout": {{ $endpoint.timeout }}{{ if $endpoint.labels }},
+          "labels": {
+            {{- $labelCount := len $endpoint.labels }}
+            {{- $currentIndex := 0 }}
+            {{- range $key, $value := $endpoint.labels }}
+            {{- $currentIndex = add $currentIndex 1 }}
+            {{ $key | quote }}: {{ $value | quote }}{{ if ne $currentIndex $labelCount }},{{ end }}
+            {{- end }}
+          }{{ end }}{{ if $endpoint.probe_type }},
+          "probe_type": {{ $endpoint.probe_type | quote }}{{ end }}
+        }
+        {{- end }}
+      ],
+      "server": {
+        "port": {{ .Values.env.WEB_PORT | quote }}
+      },
+      "metrics": {
+        "enabled": {{ .Values.env.METRICS_ENABLED }},
+        "path": {{ .Values.env.METRICS_PATH | quote }},
+        "port": {{ .Values.env.METRICS_PORT | quote }}
+      }
+    }
