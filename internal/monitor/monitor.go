@@ -10,17 +10,17 @@ import (
 	"sync"
 	"time"
 
-	"health-monitoring/internal/models"
+	"health-caretaker/internal/models"
 
 	"github.com/gorilla/websocket"
 )
 
 // Monitor manages endpoint monitoring
 type Monitor struct {
-	endpoints map[string]*models.Endpoint
-	clients   map[*websocket.Conn]bool
-	upgrader  websocket.Upgrader
-	mutex     sync.RWMutex
+	endpoints       map[string]*models.Endpoint
+	clients         map[*websocket.Conn]bool
+	upgrader        websocket.Upgrader
+	mutex           sync.RWMutex
 	metricsCallback func(*models.Endpoint) // Callback for metrics updates
 }
 
@@ -121,10 +121,10 @@ func (m *Monitor) CheckEndpoint(endpoint *models.Endpoint) {
 	// Perform request
 	resp, err := client.Do(req)
 	responseTime := time.Since(start).Milliseconds()
-	
+
 	endpoint.LastCheck = time.Now()
 	endpoint.ResponseTime = responseTime
-	
+
 	if err != nil {
 		endpoint.Status = "down"
 		endpoint.Error = err.Error()
@@ -132,17 +132,17 @@ func (m *Monitor) CheckEndpoint(endpoint *models.Endpoint) {
 	} else {
 		endpoint.StatusCode = resp.StatusCode
 		endpoint.Error = ""
-		
+
 		if resp.StatusCode >= 200 && resp.StatusCode < 400 {
 			endpoint.Status = "up"
 		} else {
 			endpoint.Status = "down"
 			endpoint.Error = fmt.Sprintf("HTTP %d", resp.StatusCode)
 		}
-		
+
 		resp.Body.Close()
 	}
-	
+
 	// Update metrics if callback is set
 	if m.metricsCallback != nil {
 		m.metricsCallback(endpoint)

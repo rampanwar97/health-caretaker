@@ -1,4 +1,4 @@
-module health-monitoring
+module health-caretaker
 
 go 1.21
 

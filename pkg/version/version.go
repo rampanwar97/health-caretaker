@@ -6,11 +6,11 @@ import (
 )
 
 var (
-	// Version is the application version
-	Version = "1.0.0"
-	// BuildTime is the build timestamp
+	// Version is the application version (set via build flags)
+	Version = "dev"
+	// BuildTime is the build timestamp (set via build flags)
 	BuildTime = "unknown"
-	// GitCommit is the git commit hash
+	// GitCommit is the git commit hash (set via build flags)
 	GitCommit = "unknown"
 	// GoVersion is the Go version used to build the application
 	GoVersion = runtime.Version()

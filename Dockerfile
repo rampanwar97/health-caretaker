@@ -18,11 +18,16 @@ RUN go mod download && go mod verify
 # Copy source code
 COPY . .
 
-# Build the application with optimizations
+# Build arguments for version information
+ARG VERSION=dev
+ARG COMMIT_SHA=unknown
+ARG BUILD_DATE=unknown
+
+# Build the application with version information
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-    -ldflags='-w -s -extldflags "-static"' \
+    -ldflags="-w -s -extldflags '-static' -X 'main.Version=${VERSION}' -X 'main.CommitSHA=${COMMIT_SHA}' -X 'main.BuildDate=${BUILD_DATE}'" \
     -a -installsuffix cgo \
-    -o health-monitor \
+    -o health-caretaker \
     ./cmd/server
 
 # Final stage
@@ -34,7 +39,7 @@ COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /etc/passwd /etc/passwd
 
 # Copy the binary
-COPY --from=builder /app/health-monitor /health-monitor
+COPY --from=builder /app/health-caretaker /health-caretaker
 
 # Copy static files
 COPY --from=builder /app/static /static
@@ -50,7 +55,7 @@ EXPOSE 8080 9091
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD ["/health-monitor", "-version"] || exit 1
+    CMD ["/health-caretaker", "-version"] || exit 1
 
 # Run the application
-ENTRYPOINT ["/health-monitor"]
+ENTRYPOINT ["/health-caretaker"]

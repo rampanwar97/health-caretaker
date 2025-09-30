@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  health-monitor:
+  health-caretaker:
     build: .
     ports:
       - "${WEB_PORT:-8080}:${WEB_PORT:-8080}"  # Web UI and API
@@ -13,7 +13,7 @@ services:
       - METRICS_PATH=${METRICS_PATH:-/metrics}
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "/health-monitor", "-version"]
+      test: ["CMD", "/health-caretaker", "-version"]
       interval: 30s
       timeout: 10s
       retries: 3

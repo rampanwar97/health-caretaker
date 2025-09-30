@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"health-monitoring/pkg/logger"
+	"health-caretaker/pkg/logger"
 )
 
 // Server represents an HTTP server with graceful shutdown

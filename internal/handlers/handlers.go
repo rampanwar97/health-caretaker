@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"health-monitoring/internal/models"
-	"health-monitoring/internal/monitor"
+	"health-caretaker/internal/models"
+	"health-caretaker/internal/monitor"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -132,7 +132,7 @@ func (h *Handler) HandleHealthz(w http.ResponseWriter, r *http.Request) {
 	response := map[string]interface{}{
 		"status":    "healthy",
 		"timestamp": time.Now().Unix(),
-		"service":   "health-monitoring",
+		"service":   "health-caretaker",
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -149,7 +149,7 @@ func (h *Handler) HandleReadyz(w http.ResponseWriter, r *http.Request) {
 	response := map[string]interface{}{
 		"status":               "ready",
 		"timestamp":            time.Now().Unix(),
-		"service":              "health-monitoring",
+		"service":              "health-caretaker",
 		"endpoints_configured": len(endpoints),
 	}
 

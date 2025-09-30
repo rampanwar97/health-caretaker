@@ -5,13 +5,13 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOMOD=$(GOCMD) mod
-BINARY_NAME=health-monitor
+BINARY_NAME=health-caretaker
 BINARY_UNIX=$(BINARY_NAME)_unix
 
 # Build flags
-LDFLAGS=-ldflags "-X health-monitoring/pkg/version.Version=$(VERSION) -X health-monitoring/pkg/version.BuildTime=$(BUILD_TIME) -X health-monitoring/pkg/version.GitCommit=$(GIT_COMMIT)"
+LDFLAGS=-ldflags "-X 'main.Version=$(VERSION)' -X 'main.CommitSHA=$(GIT_COMMIT)' -X 'main.BuildDate=$(BUILD_TIME)'"
 VERSION=$(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
-BUILD_TIME=$(shell date -u '+%Y-%m-%d_%H:%M:%S')
+BUILD_TIME=$(shell date -u '+%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
 .PHONY: all build clean test deps run docker-build docker-run help
@@ -72,12 +72,12 @@ lint:
 
 # Docker build
 docker-build:
-	docker build -t health-monitor:$(VERSION) .
-	docker tag health-monitor:$(VERSION) health-monitor:latest
+	docker build -t health-caretaker:$(VERSION) .
+	docker tag health-caretaker:$(VERSION) health-caretaker:latest
 
 # Docker run
 docker-run:
-	docker run -p 8080:8080 -p 9091:9091 health-monitor:latest
+	docker run -p 8080:8080 -p 9091:9091 health-caretaker:latest
 
 # Docker Compose up
 compose-up:

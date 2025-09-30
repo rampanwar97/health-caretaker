@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"health-monitoring/internal/models"
+	"health-caretaker/internal/models"
 )
 
 // Config represents the application configuration

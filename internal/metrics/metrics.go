@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"health-monitoring/internal/models"
+	"health-caretaker/internal/models"
 )
 
 // MetricsCollector collects and serves metrics

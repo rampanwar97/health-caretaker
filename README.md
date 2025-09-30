@@ -1,4 +1,4 @@
-# Health Monitoring Dashboard
+# Health Caretaker Dashboard
 
 A modern, real-time health monitoring application built with Go that allows you to monitor HTTP/HTTPS endpoints and view their status through a beautiful web interface.
 
@@ -13,6 +13,7 @@ A modern, real-time health monitoring application built with Go that allows you 
 - 🏷️ **Custom Labels**: Add custom labels to metrics for better organization and filtering
 - 📈 **Prometheus Metrics**: Export metrics in Prometheus format with detailed labels
 - 📱 **Mobile Friendly**: Responsive design that works on all devices
+- 🚀 **CI/CD Ready**: GitHub Actions workflow for automated Docker builds and releases
 
 ## Quick Start
 
@@ -204,12 +205,52 @@ docker compose down
 - No authentication is implemented - consider adding authentication for production use
 - The WebSocket connection allows all origins - restrict this for production
 
+## CI/CD and Docker Builds
+
+This project includes automated CI/CD workflows using GitHub Actions for building and pushing Docker images to Docker Hub.
+
+### GitHub Actions Setup
+
+1. **Set up Docker Hub secrets** in your GitHub repository:
+   - Go to **Settings** → **Secrets and variables** → **Actions**
+   - Add `DOCKER_USERNAME` and `DOCKER_PASSWORD` secrets
+
+2. **Automatic builds** on:
+   - Tag push (any tag format)
+
+### Creating Releases
+
+Simply create and push a tag to trigger the build:
+
+```bash
+# Create and push a tag
+git tag v1.0.0
+git push origin v1.0.0
+
+# Or create any tag format
+git tag release-2024-01-15
+git push origin release-2024-01-15
+```
+
+### Docker Images
+
+After a successful build, the image will be available as:
+- `your-username/health-caretaker:your-tag-name`
+
+For example:
+- `your-username/health-caretaker:v1.0.0`
+- `your-username/health-caretaker:release-2024-01-15`
+- `your-username/health-caretaker:latest`
+
+For detailed CI/CD setup instructions, see [.github/README.md](.github/README.md).
+
 ## Development
 
 ### Prerequisites
 
 - Go 1.21 or higher
 - Docker (optional, for containerized deployment)
+- Make (optional, for using Makefile commands)
 
 ### Dependencies
 
@@ -219,13 +260,32 @@ docker compose down
 ### Building
 
 ```bash
-go build -o health-monitor main.go
+# Using Make (recommended)
+make build
+
+# Or manually
+go build -o health-monitor ./cmd/server
 ```
 
 ### Running Tests
 
 ```bash
+# Using Make
+make test
+
+# Or manually
 go test ./...
+```
+
+### Available Make Commands
+
+```bash
+make help          # Show all available commands
+make build         # Build the application
+make test          # Run tests
+make docker-build  # Build Docker image
+make compose-up    # Start with Docker Compose
+make version       # Show version information
 ```
 
 ## License

@@ -3,23 +3,31 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
-	"health-monitoring/internal/config"
-	"health-monitoring/internal/handlers"
-	"health-monitoring/internal/metrics"
-	"health-monitoring/internal/models"
-	"health-monitoring/internal/monitor"
-	"health-monitoring/internal/server"
-	"health-monitoring/pkg/logger"
-	"health-monitoring/pkg/middleware"
-	"health-monitoring/pkg/version"
+	"health-caretaker/internal/config"
+	"health-caretaker/internal/handlers"
+	"health-caretaker/internal/metrics"
+	"health-caretaker/internal/models"
+	"health-caretaker/internal/monitor"
+	"health-caretaker/internal/server"
+	"health-caretaker/pkg/logger"
+	"health-caretaker/pkg/middleware"
 
 	"github.com/gorilla/mux"
+)
+
+// Build-time variables (set via ldflags)
+var (
+	Version   = "dev"
+	CommitSHA = "unknown"
+	BuildDate = "unknown"
 )
 
 func main() {
@@ -32,13 +40,14 @@ func main() {
 
 	// Show version if requested
 	if *showVersion {
-		println(version.Info())
+		println(fmt.Sprintf("Version: %s, BuildDate: %s, CommitSHA: %s, GoVersion: %s",
+			Version, BuildDate, CommitSHA, runtime.Version()))
 		os.Exit(0)
 	}
 
 	// Initialize logger
 	log := logger.New()
-	log.Info("Starting Health Monitoring Service %s", version.Short())
+	log.Info("Starting Health Monitoring Service v%s (commit: %s, built: %s)", Version, CommitSHA, BuildDate)
 
 	// Load configuration
 	cfg, err := config.LoadConfig(*configFile)
