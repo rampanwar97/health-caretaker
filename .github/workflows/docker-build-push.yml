@@ -48,6 +48,7 @@ jobs:
         push: true
         tags: |
           ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}
+          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
         build-args: |
@@ -58,6 +59,8 @@ jobs:
     - name: Output image details
       run: |
         echo "🚀 Successfully built and pushed Docker image!"
-        echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+        echo "📦 Images pushed:"
+        echo "  - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.tag }}"
+        echo "  - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
         echo "🏷️  Tag: ${{ steps.tag.outputs.tag }}"
         echo "🔗 Commit: ${{ github.sha }}"

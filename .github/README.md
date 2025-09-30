@@ -64,10 +64,11 @@ The Docker build includes the following build arguments:
 
 ## Image Tags
 
-Images are tagged with exactly what you push:
+Images are tagged with your tag name plus `latest`:
 - `your-username/health-caretaker:v1.2.3` (if you push tag `v1.2.3`)
+- `your-username/health-caretaker:latest` (always updated to the most recent build)
 - `your-username/health-caretaker:release-2024-01-15` (if you push tag `release-2024-01-15`)
-- `your-username/health-caretaker:latest` (if you push tag `latest`)
+- `your-username/health-caretaker:latest` (updated to release-2024-01-15)
 
 ## Usage
 
@@ -80,8 +81,41 @@ docker pull your-username/health-caretaker:latest
 # Pull a specific version
 docker pull your-username/health-caretaker:v1.2.3
 
-# Run the container
-docker run -p 8080:8080 -p 9091:9091 your-username/health-caretaker:latest
+# Run the container with default settings
+docker run -d \
+  --name health-caretaker \
+  -p 8080:8080 \
+  -p 9091:9091 \
+  your-username/health-caretaker:latest
+
+# Run with custom environment variables
+docker run -d \
+  --name health-caretaker \
+  -p 3000:3000 \
+  -p 9092:9092 \
+  -e WEB_PORT=3000 \
+  -e METRICS_PORT=9092 \
+  -e METRICS_ENABLED=true \
+  your-username/health-caretaker:latest
+```
+
+### Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WEB_PORT` | `8080` | Port for the web UI and API |
+| `METRICS_PORT` | `9091` | Port for Prometheus metrics |
+| `METRICS_ENABLED` | `true` | Enable/disable metrics endpoint |
+| `METRICS_PATH` | `/metrics` | Path for metrics endpoint |
+
+### Health Checks
+
+The Docker image includes built-in health checks that verify the application is running correctly:
+
+```bash
+# Check container health status
+docker ps
+docker inspect health-caretaker --format='{{.State.Health.Status}}'
 ```
 
 ## Troubleshooting

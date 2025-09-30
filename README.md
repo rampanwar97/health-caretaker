@@ -17,7 +17,33 @@ A modern, real-time health monitoring application built with Go that allows you 
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
+### Using Docker Hub (Recommended)
+
+Pull and run the latest image from Docker Hub:
+
+```bash
+# Pull the latest image
+docker pull your-username/health-caretaker:latest
+
+# Run with default settings
+docker run -d \
+  --name health-caretaker \
+  -p 8080:8080 \
+  -p 9091:9091 \
+  your-username/health-caretaker:latest
+
+# Or run with custom environment variables
+docker run -d \
+  --name health-caretaker \
+  -p 3000:3000 \
+  -p 9092:9092 \
+  -e WEB_PORT=3000 \
+  -e METRICS_PORT=9092 \
+  -e METRICS_ENABLED=true \
+  your-username/health-caretaker:latest
+```
+
+### Using Docker Compose
 
 1. Clone or download this repository
 2. Run the application:
@@ -35,9 +61,18 @@ A modern, real-time health monitoring application built with Go that allows you 
    ```
 3. Run the application:
    ```bash
-   go run main.go
+   go run ./cmd/server
    ```
 4. Open your browser and navigate to `http://localhost:8080`
+
+### Accessing the Application
+
+After starting the application, you can access:
+
+- **Web Dashboard**: `http://localhost:8080` - Main monitoring interface
+- **Prometheus Metrics**: `http://localhost:9091/metrics` - Metrics endpoint
+- **Health Check**: `http://localhost:8080/healthz` - Application health status
+- **Readiness Check**: `http://localhost:8080/readyz` - Application readiness status
 
 ## Usage
 
@@ -205,6 +240,141 @@ docker compose down
 - No authentication is implemented - consider adding authentication for production use
 - The WebSocket connection allows all origins - restrict this for production
 
+## Docker Hub Repository
+
+### Available Images
+
+The application is available on Docker Hub with the following tags:
+
+- `your-username/health-caretaker:latest` - Always points to the most recent build
+- `your-username/health-caretaker:v1.0.0` - Specific version tags
+- `your-username/health-caretaker:release-2024-01-15` - Date-based releases
+
+> **Note**: Every time you push a tag, both the specific tag and `latest` are updated automatically.
+
+### Running from Docker Hub
+
+#### Basic Usage
+
+```bash
+# Pull and run the latest image
+docker run -d \
+  --name health-caretaker \
+  -p 8080:8080 \
+  -p 9091:9091 \
+  your-username/health-caretaker:latest
+```
+
+#### With Custom Configuration
+
+```bash
+# Run with custom ports and settings
+docker run -d \
+  --name health-caretaker \
+  -p 3000:3000 \
+  -p 9092:9092 \
+  -e WEB_PORT=3000 \
+  -e METRICS_PORT=9092 \
+  -e METRICS_ENABLED=true \
+  -e METRICS_PATH=/custom-metrics \
+  your-username/health-caretaker:latest
+```
+
+#### With Custom Config File
+
+```bash
+# Run with your own configuration file
+docker run -d \
+  --name health-caretaker \
+  -p 8080:8080 \
+  -p 9091:9091 \
+  -v /path/to/your/config.json:/config.json:ro \
+  your-username/health-caretaker:latest
+```
+
+### Environment Variables
+
+The application supports the following environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `WEB_PORT` | `8080` | Port for the web UI and API |
+| `METRICS_PORT` | `9091` | Port for Prometheus metrics |
+| `METRICS_ENABLED` | `true` | Enable/disable metrics endpoint |
+| `METRICS_PATH` | `/metrics` | Path for metrics endpoint |
+
+#### Environment Variable Examples
+
+```bash
+# Production setup with custom ports
+docker run -d \
+  --name health-caretaker \
+  -p 80:80 \
+  -p 9090:9090 \
+  -e WEB_PORT=80 \
+  -e METRICS_PORT=9090 \
+  -e METRICS_PATH=/prometheus/metrics \
+  your-username/health-caretaker:latest
+
+# Development setup
+docker run -d \
+  --name health-caretaker-dev \
+  -p 3000:3000 \
+  -p 9091:9091 \
+  -e WEB_PORT=3000 \
+  your-username/health-caretaker:latest
+```
+
+### Health Checks
+
+The Docker image includes built-in health checks:
+
+```bash
+# Check container health
+docker ps
+docker inspect health-caretaker --format='{{.State.Health.Status}}'
+
+# View health check logs
+docker inspect health-caretaker --format='{{range .State.Health.Log}}{{.Output}}{{end}}'
+```
+
+### Docker Compose with Environment Variables
+
+Create a `docker-compose.yml` file:
+
+```yaml
+version: '3.8'
+
+services:
+  health-caretaker:
+    image: your-username/health-caretaker:latest
+    ports:
+      - "${WEB_PORT:-8080}:${WEB_PORT:-8080}"
+      - "${METRICS_PORT:-9091}:${METRICS_PORT:-9091}"
+    environment:
+      - WEB_PORT=${WEB_PORT:-8080}
+      - METRICS_PORT=${METRICS_PORT:-9091}
+      - METRICS_ENABLED=${METRICS_ENABLED:-true}
+      - METRICS_PATH=${METRICS_PATH:-/metrics}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "/health-caretaker", "-version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+```
+
+Then run with:
+
+```bash
+# With default settings
+docker compose up -d
+
+# With custom environment variables
+WEB_PORT=3000 METRICS_PORT=9092 docker compose up -d
+```
+
 ## CI/CD and Docker Builds
 
 This project includes automated CI/CD workflows using GitHub Actions for building and pushing Docker images to Docker Hub.
@@ -234,13 +404,13 @@ git push origin release-2024-01-15
 
 ### Docker Images
 
-After a successful build, the image will be available as:
-- `your-username/health-caretaker:your-tag-name`
+After a successful build, the images will be available as:
+- `your-username/health-caretaker:your-tag-name` (specific version)
+- `your-username/health-caretaker:latest` (always points to the most recent build)
 
-For example:
+For example, when you push tag `v1.0.0`:
 - `your-username/health-caretaker:v1.0.0`
-- `your-username/health-caretaker:release-2024-01-15`
-- `your-username/health-caretaker:latest`
+- `your-username/health-caretaker:latest` (updated to v1.0.0)
 
 For detailed CI/CD setup instructions, see [.github/README.md](.github/README.md).
 
