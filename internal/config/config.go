@@ -86,6 +86,12 @@ func getDefaultConfig() *Config {
 				Method:   "GET",
 				Interval: 30,
 				Timeout:  10,
+				Labels: map[string]string{
+					"service":     "search",
+					"environment": "production",
+					"team":        "platform",
+					"criticality": "high",
+				},
 			},
 			{
 				Name:     "GitHub",
@@ -93,6 +99,12 @@ func getDefaultConfig() *Config {
 				Method:   "GET",
 				Interval: 60,
 				Timeout:  15,
+				Labels: map[string]string{
+					"service":     "api",
+					"environment": "production",
+					"team":        "development",
+					"criticality": "medium",
+				},
 			},
 		},
 		Server: ServerConfig{
@@ -108,10 +120,15 @@ func getDefaultConfig() *Config {
 
 // applyEnvOverrides applies environment variable overrides to the configuration
 func applyEnvOverrides(config *Config) {
+	// Server configuration overrides
+	if port := os.Getenv("WEB_PORT"); port != "" {
+		config.Server.Port = port
+	}
 	if port := os.Getenv("SERVER_PORT"); port != "" {
 		config.Server.Port = port
 	}
 
+	// Metrics configuration overrides
 	if enabled := os.Getenv("METRICS_ENABLED"); enabled != "" {
 		config.Metrics.Enabled = enabled == "true"
 	}

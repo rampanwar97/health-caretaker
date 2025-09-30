@@ -10,6 +10,8 @@ A modern, real-time health monitoring application built with Go that allows you 
 - ⚡ **Fast & Lightweight**: Built with Go for high performance
 - 🐳 **Docker Ready**: Easy deployment with Docker and Docker Compose
 - 🔧 **Configurable**: Customizable check intervals, timeouts, and HTTP methods
+- 🏷️ **Custom Labels**: Add custom labels to metrics for better organization and filtering
+- 📈 **Prometheus Metrics**: Export metrics in Prometheus format with detailed labels
 - 📱 **Mobile Friendly**: Responsive design that works on all devices
 
 ## Quick Start
@@ -95,11 +97,81 @@ curl http://localhost:8080/api/endpoints
 
 ## Configuration
 
-The application runs on port 8080 by default. You can modify the port by changing the `port` variable in `main.go`.
+The application uses a `config.json` file for configuration. You can modify this file to add your own endpoints or change default settings.
+
+### Example Configuration
+
+```json
+{
+  "endpoints": [
+    {
+      "name": "Google",
+      "url": "https://www.google.com",
+      "method": "GET",
+      "interval": 30,
+      "timeout": 10,
+      "labels": {
+        "service": "search",
+        "environment": "production",
+        "team": "platform",
+        "criticality": "high"
+      }
+    }
+  ],
+  "server": {
+    "port": "8080"
+  },
+  "metrics": {
+    "enabled": true,
+    "path": "/metrics",
+    "port": "9091"
+  }
+}
+```
+
+### Custom Labels
+
+You can add custom labels to each endpoint for better organization and filtering in your monitoring system. Labels are included in all Prometheus metrics and can be used for:
+
+- **Service Classification**: Group endpoints by service type
+- **Environment Separation**: Distinguish between production, staging, development
+- **Team Ownership**: Assign endpoints to specific teams
+- **Criticality Levels**: Mark endpoints by importance
+- **Custom Metadata**: Add any additional information
+
+#### Label Examples
+
+```json
+{
+  "name": "API Health Check",
+  "url": "https://api.example.com/health",
+  "method": "GET",
+  "interval": 30,
+  "timeout": 10,
+  "labels": {
+    "service": "api",
+    "environment": "production",
+    "team": "backend",
+    "criticality": "high",
+    "datacenter": "us-east-1",
+    "version": "v2.1.0",
+    "component": "authentication"
+  }
+}
+```
+
+These labels will appear in your Prometheus metrics like:
+```
+probe_success{name="API Health Check", url="https://api.example.com/health", service="api", environment="production", team="backend", criticality="high", datacenter="us-east-1", version="v2.1.0", component="authentication"} 1
+```
 
 ### Environment Variables
 
-- `PORT`: Server port (default: 8080)
+- `WEB_PORT`: Web server port (default: 8080)
+- `METRICS_PORT`: Metrics server port (default: 9091)
+- `METRICS_ENABLED`: Enable metrics server (default: true)
+- `METRICS_PATH`: Metrics endpoint path (default: /metrics)
+- `DEBUG`: Enable debug logging (default: false)
 
 ## Docker Deployment
 

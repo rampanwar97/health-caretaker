@@ -54,6 +54,10 @@ run: build
 run-config: build
 	./$(BINARY_NAME) -config=config.json
 
+# Run with environment variables
+run-env: build
+	WEB_PORT=$(WEB_PORT) METRICS_PORT=$(METRICS_PORT) ./$(BINARY_NAME)
+
 # Show version
 version: build
 	./$(BINARY_NAME) -version
@@ -79,6 +83,10 @@ docker-run:
 compose-up:
 	docker compose up --build
 
+# Docker Compose up with custom ports
+compose-up-env:
+	WEB_PORT=$(WEB_PORT) METRICS_PORT=$(METRICS_PORT) docker compose up --build
+
 # Docker Compose down
 compose-down:
 	docker compose down
@@ -98,12 +106,14 @@ help:
 	@echo "  deps          - Download dependencies"
 	@echo "  run           - Build and run the application"
 	@echo "  run-config    - Run with custom config file"
+	@echo "  run-env       - Run with environment variables (WEB_PORT, METRICS_PORT)"
 	@echo "  version       - Show version information"
 	@echo "  fmt           - Format code"
 	@echo "  lint          - Lint code"
 	@echo "  docker-build  - Build Docker image"
 	@echo "  docker-run    - Run Docker container"
 	@echo "  compose-up    - Start with Docker Compose"
+	@echo "  compose-up-env - Start with Docker Compose using env vars"
 	@echo "  compose-down  - Stop Docker Compose"
 	@echo "  install-tools - Install development tools"
 	@echo "  help          - Show this help"

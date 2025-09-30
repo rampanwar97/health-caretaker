@@ -25,7 +25,7 @@ import (
 func main() {
 	// Parse command line flags
 	var (
-		configFile = flag.String("config", "config.json", "Configuration file path")
+		configFile  = flag.String("config", "config.json", "Configuration file path")
 		showVersion = flag.Bool("version", false, "Show version information")
 	)
 	flag.Parse()
@@ -68,6 +68,11 @@ func main() {
 		endpoint := endpointConfig.ToEndpoint()
 		monitor.AddEndpoint(endpoint)
 		log.Info("Added endpoint: %s (%s)", endpoint.Name, endpoint.URL)
+		if endpoint.Labels != nil && len(endpoint.Labels) > 0 {
+			log.Info("  Labels: %v", endpoint.Labels)
+		} else {
+			log.Info("  No custom labels configured")
+		}
 	}
 
 	// Start monitoring in background
@@ -77,7 +82,7 @@ func main() {
 
 	// Setup main server routes
 	mainRouter := mux.NewRouter()
-	
+
 	// Add middleware
 	mainRouter.Use(middleware.LoggingMiddleware(log))
 	mainRouter.Use(middleware.CORSMiddleware())
@@ -105,7 +110,7 @@ func main() {
 
 	// Create servers
 	mainServer := server.New(":"+cfg.Server.Port, mainRouter, "Main", log)
-	
+
 	var metricsServer *server.Server
 	if cfg.Metrics.Enabled {
 		// Create metrics-only router
@@ -114,7 +119,7 @@ func main() {
 		metricsRouter.HandleFunc(cfg.Metrics.Path, handler.HandleMetrics)
 		metricsRouter.HandleFunc("/healthz", handler.HandleHealthz)
 		metricsRouter.HandleFunc("/readyz", handler.HandleReadyz)
-		
+
 		metricsServer = server.New(":"+cfg.Metrics.Port, metricsRouter, "Metrics", log)
 		log.Info("Metrics available at http://localhost:%s%s", cfg.Metrics.Port, cfg.Metrics.Path)
 	}

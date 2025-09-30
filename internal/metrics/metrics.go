@@ -122,6 +122,15 @@ func (mc *MetricsCollector) buildLabels(endpoint *models.Endpoint) string {
 		fmt.Sprintf("url=\"%s\"", endpoint.URL),
 	}
 
+	// Add custom labels from endpoint configuration
+	if endpoint.Labels != nil && len(endpoint.Labels) > 0 {
+		for key, value := range endpoint.Labels {
+			// Escape quotes in label values
+			escapedValue := mc.escapeLabelValue(value)
+			labels = append(labels, fmt.Sprintf("%s=\"%s\"", key, escapedValue))
+		}
+	}
+
 	// Join all labels
 	result := ""
 	for i, label := range labels {
@@ -132,4 +141,27 @@ func (mc *MetricsCollector) buildLabels(endpoint *models.Endpoint) string {
 	}
 
 	return result
+}
+
+// escapeLabelValue escapes special characters in label values
+func (mc *MetricsCollector) escapeLabelValue(value string) string {
+	// Replace backslashes and quotes with escaped versions
+	escaped := ""
+	for _, char := range value {
+		switch char {
+		case '\\':
+			escaped += "\\\\"
+		case '"':
+			escaped += "\\\""
+		case '\n':
+			escaped += "\\n"
+		case '\r':
+			escaped += "\\r"
+		case '\t':
+			escaped += "\\t"
+		default:
+			escaped += string(char)
+		}
+	}
+	return escaped
 }

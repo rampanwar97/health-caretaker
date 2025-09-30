@@ -5,28 +5,53 @@
       "url": "https://www.google.com",
       "method": "GET",
       "interval": 30,
-      "timeout": 10
+      "timeout": 10,
+      "labels": {
+        "service": "search",
+        "environment": "production",
+        "team": "platform",
+        "criticality": "high"
+      }
     },
     {
       "name": "GitHub API",
       "url": "https://api.github.com",
       "method": "GET",
       "interval": 60,
-      "timeout": 15
+      "timeout": 15,
+      "labels": {
+        "service": "api",
+        "environment": "production",
+        "team": "development",
+        "criticality": "medium"
+      }
     },
     {
       "name": "HTTPBin",
       "url": "https://httpbin.org/status/200",
       "method": "GET",
       "interval": 45,
-      "timeout": 10
+      "timeout": 10,
+      "labels": {
+        "service": "testing",
+        "environment": "staging",
+        "team": "qa",
+        "criticality": "low"
+      }
     },
     {
       "name": "Example Down Service",
       "url": "https://httpbin.org/status/500",
       "method": "GET",
       "interval": 30,
-      "timeout": 10
+      "timeout": 10,
+      "labels": {
+        "service": "example",
+        "environment": "testing",
+        "team": "demo",
+        "criticality": "low",
+        "expected_status": "down"
+      }
     }
   ],
   "server": {
