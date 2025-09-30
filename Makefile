@@ -75,9 +75,28 @@ docker-build:
 	docker build -t health-caretaker:$(VERSION) .
 	docker tag health-caretaker:$(VERSION) health-caretaker:latest
 
+# Docker build with distroless base image (includes glibc)
+docker-build-base:
+	docker build -f Dockerfile.distroless-base -t health-caretaker-base:$(VERSION) .
+	docker tag health-caretaker-base:$(VERSION) health-caretaker-base:latest
+
+# Multi-architecture Docker build
+docker-build-multi:
+	docker buildx build --platform linux/amd64,linux/arm64 -t health-caretaker:$(VERSION) .
+	docker buildx build --platform linux/amd64,linux/arm64 -t health-caretaker:latest .
+
+# Multi-architecture Docker build with distroless base
+docker-build-multi-base:
+	docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile.distroless-base -t health-caretaker-base:$(VERSION) .
+	docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile.distroless-base -t health-caretaker-base:latest .
+
 # Docker run
 docker-run:
 	docker run -p 8080:8080 -p 9091:9091 health-caretaker:latest
+
+# Docker run with distroless base
+docker-run-base:
+	docker run -p 8080:8080 -p 9091:9091 health-caretaker-base:latest
 
 # Docker Compose up
 compose-up:
@@ -110,8 +129,12 @@ help:
 	@echo "  version       - Show version information"
 	@echo "  fmt           - Format code"
 	@echo "  lint          - Lint code"
-	@echo "  docker-build  - Build Docker image"
-	@echo "  docker-run    - Run Docker container"
+	@echo "  docker-build  - Build Docker image (distroless static)"
+	@echo "  docker-build-base - Build Docker image (distroless base with glibc)"
+	@echo "  docker-build-multi - Build multi-arch Docker image (distroless static)"
+	@echo "  docker-build-multi-base - Build multi-arch Docker image (distroless base)"
+	@echo "  docker-run    - Run Docker container (distroless static)"
+	@echo "  docker-run-base - Run Docker container (distroless base)"
 	@echo "  compose-up    - Start with Docker Compose"
 	@echo "  compose-up-env - Start with Docker Compose using env vars"
 	@echo "  compose-down  - Stop Docker Compose"
