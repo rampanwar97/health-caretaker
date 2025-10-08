@@ -40,7 +40,10 @@ func (h *Handler) HandleAPIEndpoints(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
 		endpoints := h.monitor.GetEndpoints()
-		json.NewEncoder(w).Encode(endpoints)
+		if err := json.NewEncoder(w).Encode(endpoints); err != nil {
+			http.Error(w, "encode error", http.StatusInternalServerError)
+			return
+		}
 
 	case "POST":
 		var endpoint models.Endpoint
@@ -50,13 +53,17 @@ func (h *Handler) HandleAPIEndpoints(w http.ResponseWriter, r *http.Request) {
 		}
 
 		h.monitor.AddEndpoint(&endpoint)
-		json.NewEncoder(w).Encode(endpoint)
+		w.WriteHeader(http.StatusCreated)
+		if err := json.NewEncoder(w).Encode(endpoint); err != nil {
+			http.Error(w, "encode error", http.StatusInternalServerError)
+			return
+		}
 
 	case "DELETE":
 		vars := mux.Vars(r)
 		id := vars["id"]
 		h.monitor.RemoveEndpoint(id)
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusNoContent)
 	}
 }
 

@@ -40,8 +40,8 @@ func main() {
 
 	// Show version if requested
 	if *showVersion {
-		println(fmt.Sprintf("Version: %s, BuildDate: %s, CommitSHA: %s, GoVersion: %s",
-			Version, BuildDate, CommitSHA, runtime.Version()))
+		fmt.Printf("Version: %s, BuildDate: %s, CommitSHA: %s, GoVersion: %s\n",
+			Version, BuildDate, CommitSHA, runtime.Version())
 		os.Exit(0)
 	}
 
