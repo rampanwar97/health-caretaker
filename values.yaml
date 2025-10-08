@@ -1,0 +1,231 @@
+# Default values for health-caretaker
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: ramp110397/health-caretaker
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1.0.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  fsGroup: 2000
+
+securityContext:
+  capabilities:
+    drop:
+    - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+  webPort: 8080
+  metricsPort: 9091
+  annotations: {}
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: health-caretaker.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: health-caretaker-tls
+  #    hosts:
+  #      - health-caretaker.local
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Health Caretaker specific configuration
+config:
+  # home-app-configurations
+  endpoints:
+    - name: "home-app-livez"
+      url: "http://home-app.brahmastra-0-core.svc.cluster.local:8080/api/livez"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "livez"
+        app: "home-app"
+    - name: "home-app-readyz"
+      url: "http://home-app.brahmastra-0-core.svc.cluster.local:8080/api/readyz"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "readyz"
+        app: "home-app"
+  # bifrost-configurations
+    - name: "bifrost-app-livez"
+      url: "http://bifrost-app.brahmastra-0-core.svc.cluster.local:8080/api/livez"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "levez"
+        app: "bifrost-app"
+    - name: "bifrost-app-readyz"
+      url: "http://bifrost-app.brahmastra-0-core.svc.cluster.local:8080/api/readyz"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "readyz"
+        app: "bifrost-app"
+  # dph-explore-configurations
+    - name: "dph-explore-livez"
+      url: "http://dph-explore.brahmastra-0-core.svc.cluster.local:8080/api/livez"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "livez"
+        app: "dph-explore"
+    - name: "dph-explore-readyz"
+      url: "http://dph-explore.brahmastra-0-core.svc.cluster.local:8080/api/readyz"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "readyz"
+        app: "dph-explore"
+  # dph-explore-configurations
+    - name: "dph-discover-livez"
+      url: "http://dph-discover.brahmastra-0-core.svc.cluster.local:8080/api/livez"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "livez"
+        app: "dph-discover"
+    - name: "dph-discover-readyz"
+      url: "http://dph-discover.brahmastra-0-core.svc.cluster.local:8080/api/readyz"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "readyz"
+        app: "dph-discover"
+  # dph-explore-configurations
+    - name: "dph-discover-livez"
+      url: "http://dph-discover.brahmastra-0-core.svc.cluster.local:8080/api/livez"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "livez"
+        app: "dph-discover"
+    - name: "dph-discover-readyz"
+      url: "http://dph-discover.brahmastra-0-core.svc.cluster.local:8080/api/readyz"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "readyz"
+        app: "dph-discover"
+  # Heimdall-api-configurations
+    - name: "heimdall-api-livez"
+      url: "https://heimdall-api.brahmastra-0-core.svc.cluster.local:32010/heimdall/api/livez"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "livez"
+        app: "heimdall-api"
+    - name: "heimdall-api-readyz"
+      url: "https://heimdall-api.brahmastra-0-core.svc.cluster.local:32010/heimdall/api/readyz"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "readyz"
+        app: "heimdall-api"
+  # heph-service-configurations
+    - name: "heph-service-livez"
+      url: "https://heph-service.cks-0-core.svc.cluster.local:32090/heph/api/livez"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "livez"
+        app: "heph-service"
+    - name: "heph-service-readyz"
+      url: "https://heph-service.cks-0-core.svc.cluster.local:32090/heph/api/readyz"
+      method: "GET"
+      interval: 30
+      timeout: 10
+      labels:
+        probe_type: "readyz"
+        app: "heph-service"
+
+# Environment variables
+env:
+  WEB_PORT: 8080
+  METRICS_PORT: 9091
+  METRICS_ENABLED: "true"
+  METRICS_PATH: "/metrics"
+
+# Pod Disruption Budget
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
+# Network Policy
+networkPolicy:
+  enabled: false
+  ingress: []
+  egress: []
+
+# Service Monitor for Prometheus Operator
+serviceMonitor:
+  enabled: true
+  namespace: ""
+  interval: 30s
+  scrapeTimeout: 10s
+  labels: {}
+  annotations: {}
+

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "Running go vet ./..."
+
+if ! command -v go >/dev/null 2>&1; then
+  echo "Error: 'go' is not installed or not in PATH." >&2
+  exit 1
+fi
+
+# Run vet; fail the commit if it reports issues
+go vet ./...
+
+echo "go vet passed."
+
